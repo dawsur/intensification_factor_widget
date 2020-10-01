@@ -13155,8 +13155,6 @@ div#notebook {
 <span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">print_function</span>
 <span class="kn">from</span> <span class="nn">ipywidgets</span> <span class="kn">import</span> <span class="n">interact</span><span class="p">,</span> <span class="n">interactive</span><span class="p">,</span> <span class="n">fixed</span><span class="p">,</span> <span class="n">interact_manual</span>
 <span class="kn">from</span> <span class="nn">ipywidgets</span> <span class="kn">import</span> <span class="n">widgets</span>
-<span class="kn">from</span> <span class="nn">IPython.core.display</span> <span class="kn">import</span> <span class="n">HTML</span>
-<span class="kn">from</span> <span class="nn">IPython.display</span> <span class="kn">import</span> <span class="n">Markdown</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">import</span> <span class="nn">math</span>
 
@@ -13211,8 +13209,7 @@ div#notebook {
             <span class="c1"># Creating a data frame; column names defined by the user, index column F_a, F_b, b</span>
             <span class="c1"># rendered with Markdown</span>
 <span class="c1">#             df = pd.DataFrame(data, columns = columns, index = [r&#39;$$F_a$$&#39;, r&#39;$$F_b$$&#39;, r&#39;$$b$$&#39;])</span>
-            <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">columns</span> <span class="o">=</span> <span class="n">columns</span><span class="p">,</span> \
-                              <span class="n">index</span> <span class="o">=</span> <span class="p">[</span><span class="n">Markdown</span><span class="p">(</span><span class="s1">&#39;$$F_a$$&#39;</span><span class="p">),</span> <span class="n">Markdown</span><span class="p">(</span><span class="s1">&#39;$$F_b$$&#39;</span><span class="p">),</span> <span class="n">Markdown</span><span class="p">(</span><span class="s1">&#39;$$b$$&#39;</span><span class="p">)])</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">columns</span> <span class="o">=</span> <span class="n">columns</span><span class="p">,</span> <span class="n">index</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;$$F_a$$&#39;</span><span class="p">,</span> <span class="s1">&#39;$F_b$&#39;</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">])</span>
             <span class="c1"># Transposing the data frame</span>
             <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">transpose</span><span class="p">()</span>
             
@@ -13225,7 +13222,7 @@ div#notebook {
                 <span class="c1"># Printing the input data in a form of a tabel</span>
                 <span class="nb">print</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)</span>
                 <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Your data input:&#39;</span><span class="p">)</span>
-                <span class="n">display</span><span class="p">(</span><span class="n">HTML</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">to_html</span><span class="p">()))</span>
+                <span class="n">display</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
         
         <span class="c1"># If lists of input arguments not equal in length</span>
         <span class="k">else</span><span class="p">:</span>
@@ -13275,8 +13272,7 @@ div#notebook {
             <span class="c1"># Creating a data frame; column names defined by the user, index column F_a, F_b, b</span>
             <span class="c1"># rendered with Markdown</span>
 <span class="c1">#             df = pd.DataFrame(data, columns = columns, index = [r&#39;$$F_a$$&#39;, r&#39;$$F_b$$&#39;, r&#39;$$b$$&#39;])</span>
-            <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">columns</span> <span class="o">=</span> <span class="n">columns</span><span class="p">,</span> \
-                              <span class="n">index</span> <span class="o">=</span> <span class="p">[</span><span class="n">Markdown</span><span class="p">(</span><span class="s1">&#39;$$F_a$$&#39;</span><span class="p">),</span> <span class="n">Markdown</span><span class="p">(</span><span class="s1">&#39;$$F_b$$&#39;</span><span class="p">),</span> <span class="n">Markdown</span><span class="p">(</span><span class="s1">&#39;$$b$$&#39;</span><span class="p">)])</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">columns</span> <span class="o">=</span> <span class="n">columns</span><span class="p">,</span> <span class="n">index</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;$$F_a$$&#39;</span><span class="p">,</span> <span class="s1">&#39;$F_b$&#39;</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">])</span>
             <span class="c1"># Transposing the data frame</span>
             <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">transpose</span><span class="p">()</span>
             
@@ -13298,7 +13294,7 @@ div#notebook {
                 <span class="c1"># Printing the input data in a form of a tabel</span>
                 <span class="nb">print</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)</span>
                 <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Your data input:&#39;</span><span class="p">)</span>
-                <span class="n">display</span><span class="p">(</span><span class="n">HTML</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">to_html</span><span class="p">()))</span>
+                <span class="n">display</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
     
     <span class="c1"># Handling exceptions</span>
     <span class="k">except</span><span class="p">:</span>
