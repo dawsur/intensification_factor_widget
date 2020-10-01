@@ -13126,7 +13126,7 @@ div#notebook {
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># This program calculates the Intensification Factor based on the method</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="s2">&quot;&quot;</span><span class="c1"># This program calculates the Intensification Factor based on the method</span>
 <span class="c1"># described here: https://doi.org/10.1016/j.cep.2017.08.013</span>
 <span class="c1"># </span>
 <span class="c1"># Copyright 2020, Dawid Surdeko, d.surdeko@utwente.nl</span>
@@ -13154,28 +13154,45 @@ div#notebook {
 <span class="c1"># Importing necessary libraries</span>
 <span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">print_function</span>
 <span class="kn">from</span> <span class="nn">ipywidgets</span> <span class="kn">import</span> <span class="n">interact</span><span class="p">,</span> <span class="n">interactive</span><span class="p">,</span> <span class="n">fixed</span><span class="p">,</span> <span class="n">interact_manual</span>
-<span class="kn">import</span> <span class="nn">ipywidgets</span> <span class="k">as</span> <span class="nn">widgets</span>
+<span class="kn">from</span> <span class="nn">ipywidgets</span> <span class="kn">import</span> <span class="n">widgets</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">math</span>
 
 <span class="c1"># Defining text input fields with some default values, rendered using LaTeX</span>
-<span class="n">F_a</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">Text</span><span class="p">(</span><span class="s1">&#39;1.7, 2.1, 3&#39;</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="sa">r</span><span class="s1">&#39;\(F_a\)&#39;</span><span class="p">)</span>
-<span class="n">F_b</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">Text</span><span class="p">(</span><span class="s1">&#39;1.2, 1.4, 2.6&#39;</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="sa">r</span><span class="s1">&#39;\(F_b\)&#39;</span><span class="p">)</span>
-<span class="n">b</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">Text</span><span class="p">(</span><span class="s1">&#39;1, 1, 1&#39;</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="sa">r</span><span class="s1">&#39;\(b\)&#39;</span><span class="p">)</span>
+<span class="n">columns_field</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">Text</span><span class="p">(</span><span class="s1">&#39;factor_1, factor_2, factor_3&#39;</span><span class="p">,</span> <span class="n">description</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;\( \text</span><span class="si">{Columns}</span><span class="s1"> \)&#39;</span><span class="p">)</span>
+<span class="n">F_a_field</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">Text</span><span class="p">(</span><span class="s1">&#39;1.7, 2.1, 3&#39;</span><span class="p">,</span> <span class="n">description</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;\(F_a\)&#39;</span><span class="p">)</span>
+<span class="n">F_b_field</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">Text</span><span class="p">(</span><span class="s1">&#39;1.2, 1.4, 2.6&#39;</span><span class="p">,</span> <span class="n">description</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;\(F_b\)&#39;</span><span class="p">)</span>
+<span class="n">b_field</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">Text</span><span class="p">(</span><span class="s1">&#39;1, 1, 1&#39;</span><span class="p">,</span> <span class="n">description</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;\(b\)&#39;</span><span class="p">)</span>
+<span class="c1"># Defining the widget output</span>
+<span class="n">output</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">Output</span><span class="p">()</span>
+<span class="c1"># Defining the button for running the code</span>
+<span class="n">button</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;Go!&quot;</span><span class="p">)</span>
 <span class="c1"># Defining the layout of the fields: one below the other</span>
-<span class="n">ui</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">VBox</span><span class="p">([</span><span class="n">F_a</span><span class="p">,</span> <span class="n">F_b</span><span class="p">,</span> <span class="n">b</span><span class="p">])</span>
+<span class="n">ui</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">VBox</span><span class="p">([</span><span class="n">columns_field</span><span class="p">,</span> <span class="n">F_a_field</span><span class="p">,</span> <span class="n">F_b_field</span><span class="p">,</span> <span class="n">b_field</span><span class="p">,</span> <span class="n">button</span><span class="p">,</span> <span class="n">output</span><span class="p">])</span>
 
-<span class="c1"># Defining function for the interact widget</span>
-<span class="k">def</span> <span class="nf">intensification_factor</span><span class="p">(</span><span class="n">F_a</span><span class="p">,</span> <span class="n">F_b</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+<span class="c1"># Defining the function that will be run on button click</span>
+<span class="k">def</span> <span class="nf">intensification_factor</span><span class="p">(</span><span class="n">button_click</span><span class="p">):</span>
+    
+    <span class="c1"># Clearing the function output</span>
+    <span class="n">output</span><span class="o">.</span><span class="n">clear_output</span><span class="p">()</span>
+    <span class="c1"># Reading values from the input fields</span>
+    <span class="n">columns</span> <span class="o">=</span> <span class="n">columns_field</span><span class="o">.</span><span class="n">value</span>
+    <span class="n">F_a</span> <span class="o">=</span> <span class="n">F_a_field</span><span class="o">.</span><span class="n">value</span>
+    <span class="n">F_b</span> <span class="o">=</span> <span class="n">F_b_field</span><span class="o">.</span><span class="n">value</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="n">b_field</span><span class="o">.</span><span class="n">value</span>
     
     <span class="c1"># Catching exceptions</span>
     <span class="k">try</span><span class="p">:</span>
     
-        <span class="c1"># Converting the text from input fields to floats</span>
+        <span class="c1"># Converting the text from column name input field to strings</span>
+        <span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">columns</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)]</span>
+        <span class="c1"># Converting the text from parameter input fields to floats</span>
         <span class="n">F_a</span> <span class="o">=</span> <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">F_a</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)]</span>
         <span class="n">F_b</span> <span class="o">=</span> <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">F_b</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)]</span>
         <span class="n">b</span> <span class="o">=</span> <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">b</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)]</span>
         
-        <span class="c1"># Checking if lists of variables are equal in length</span>
-        <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">F_a</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">F_b</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">F_b</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">b</span><span class="p">)):</span>
+        <span class="c1"># Checking if lists of input arguments are equal in length</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">columns</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">F_a</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">F_a</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">F_b</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">F_b</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">b</span><span class="p">)):</span>
         
             <span class="c1"># Defining the initial value of Intensification Factor (IF)</span>
             <span class="n">IF</span> <span class="o">=</span> <span class="mi">1</span>
@@ -13186,26 +13203,110 @@ div#notebook {
                 <span class="c1"># Calculating a single IF and multiplying it by the</span>
                 <span class="c1"># so-far calculated IF</span>
                 <span class="n">IF</span> <span class="o">=</span> <span class="n">IF</span><span class="o">*</span><span class="p">((</span><span class="n">F_a</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">/</span><span class="n">F_b</span><span class="p">[</span><span class="n">i</span><span class="p">])</span><span class="o">**</span><span class="n">b</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
-
-            <span class="c1"># Displaying the result</span>
-            <span class="nb">print</span><span class="p">(</span><span class="mi">7</span><span class="o">*</span><span class="s1">&#39; &#39;</span> <span class="o">+</span> <span class="s1">&#39;IF = &#39;</span><span class="p">,</span> <span class="n">IF</span><span class="p">)</span>
+ 
+            <span class="c1"># Creating a list of lists for creation of a data frame</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="p">[</span><span class="n">F_a</span><span class="p">,</span> <span class="n">F_b</span><span class="p">,</span> <span class="n">b</span><span class="p">]</span>
+            <span class="c1"># Creating a data frame; column names defined by the user, index column F_a, F_b, b</span>
+            <span class="c1"># rendered with Markdown</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">columns</span> <span class="o">=</span> <span class="n">columns</span><span class="p">,</span> <span class="n">index</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;$$F_a$$&#39;</span><span class="p">,</span> <span class="sa">r</span><span class="s1">&#39;$$F_b$$&#39;</span><span class="p">,</span> <span class="sa">r</span><span class="s1">&#39;$$b$$&#39;</span><span class="p">])</span>
+            <span class="c1"># Transposing the data frame</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">transpose</span><span class="p">()</span>
+            
+            <span class="c1"># Displaying the output</span>
+            <span class="k">with</span> <span class="n">output</span><span class="p">:</span>
+                
+                <span class="c1"># Printing the IF</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;IF =&#39;</span><span class="p">,</span> <span class="n">IF</span><span class="p">)</span>
+                <span class="c1"># Printing the input data in a form of a tabel</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Your data input:&#39;</span><span class="p">)</span>
+                <span class="n">display</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
         
-        <span class="c1"># If lists of variables not equal in length</span>
+        <span class="c1"># If lists of input arguments not equal in length</span>
         <span class="k">else</span><span class="p">:</span>
             
-            <span class="c1"># Printing &#39;-&#39; as the output</span>
-            <span class="nb">print</span><span class="p">(</span><span class="mi">7</span><span class="o">*</span><span class="s1">&#39; &#39;</span> <span class="o">+</span> <span class="s1">&#39;IF = -&#39;</span><span class="p">)</span>
+            <span class="c1"># Trying to calculate the IF in case only the number of labels is not matching the</span>
+            <span class="c1"># number of variables</span>
+            <span class="k">try</span><span class="p">:</span>
+                
+                <span class="c1"># Defining the initial value of Intensification Factor (IF)</span>
+                <span class="n">IF</span> <span class="o">=</span> <span class="mi">1</span>
+
+                <span class="c1"># Looping over the lists of floats</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">F_a</span><span class="p">)):</span>
+
+                    <span class="c1"># Calculating a single IF and multiplying it by the</span>
+                    <span class="c1"># so-far calculated IF</span>
+                    <span class="n">IF</span> <span class="o">=</span> <span class="n">IF</span><span class="o">*</span><span class="p">((</span><span class="n">F_a</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">/</span><span class="n">F_b</span><span class="p">[</span><span class="n">i</span><span class="p">])</span><span class="o">**</span><span class="n">b</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+            
+            <span class="c1"># If exception is caught, assigning NaN value to IF</span>
+            <span class="k">except</span><span class="p">:</span>
+                
+                <span class="n">IF</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="s2">&quot;NaN&quot;</span><span class="p">)</span>
+            
+            <span class="c1"># Finding the length of the longest list of input arguments</span>
+            <span class="n">longest</span> <span class="o">=</span> <span class="nb">max</span><span class="p">([</span><span class="nb">len</span><span class="p">(</span><span class="n">columns</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">F_a</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">F_b</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">b</span><span class="p">)])</span>
+            
+            <span class="c1"># Padding all the remaining lists or input arguments with single space strings (columns)</span>
+            <span class="c1"># or NaN values (F_a, F_b, b)</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">longest</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">columns</span><span class="p">)):</span>
+                
+                <span class="n">columns</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)</span>
+                
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">longest</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">F_a</span><span class="p">)):</span>
+                
+                <span class="n">F_a</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="s2">&quot;NaN&quot;</span><span class="p">))</span>
+                
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">longest</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">F_b</span><span class="p">)):</span>
+                
+                <span class="n">F_b</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="s2">&quot;NaN&quot;</span><span class="p">))</span>
+                
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">longest</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">b</span><span class="p">)):</span>
+                
+                <span class="n">b</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="s2">&quot;NaN&quot;</span><span class="p">))</span>
+                
+            <span class="c1"># Creating a list of lists for creation of a data frame</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="p">[</span><span class="n">F_a</span><span class="p">,</span> <span class="n">F_b</span><span class="p">,</span> <span class="n">b</span><span class="p">]</span>
+            <span class="c1"># Creating a data frame; column names defined by the user, index column F_a, F_b, b</span>
+            <span class="c1"># rendered with Markdown</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">columns</span> <span class="o">=</span> <span class="n">columns</span><span class="p">,</span> <span class="n">index</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;$$F_a$$&#39;</span><span class="p">,</span> <span class="sa">r</span><span class="s1">&#39;$$F_b$$&#39;</span><span class="p">,</span> <span class="sa">r</span><span class="s1">&#39;$$b$$&#39;</span><span class="p">])</span>
+            <span class="c1"># Transposing the data frame</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">transpose</span><span class="p">()</span>
+            
+            <span class="c1"># Displaying the output</span>
+            <span class="k">with</span> <span class="n">output</span><span class="p">:</span>
+            
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)</span>
+                
+                <span class="c1"># Checking if IF has been calculated; if not - printing &quot;Missing data!&quot;&#39;&quot;</span>
+                <span class="k">if</span> <span class="n">math</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">IF</span><span class="p">):</span>
+                    
+                    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Missing data!&#39;</span><span class="p">)</span>
+                
+                <span class="c1"># Otherwise printing the calculated IF</span>
+                <span class="k">else</span><span class="p">:</span>
+                    
+                    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;IF =&#39;</span><span class="p">,</span> <span class="n">IF</span><span class="p">)</span>
+                
+                <span class="c1"># Printing the input data in a form of a tabel</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Your data input:&#39;</span><span class="p">)</span>
+                <span class="n">display</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
     
     <span class="c1"># Handling exceptions</span>
     <span class="k">except</span><span class="p">:</span>
         
-        <span class="c1"># Printing &#39;-&#39; as the output if exception was caught</span>
-        <span class="nb">print</span><span class="p">(</span><span class="mi">7</span><span class="o">*</span><span class="s1">&#39; &#39;</span> <span class="o">+</span> <span class="s1">&#39;IF = -&#39;</span><span class="p">)</span>
+        <span class="c1"># Printing error message if another exception was caught</span>
+        <span class="k">with</span> <span class="n">output</span><span class="p">:</span>
+        
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Error: incorrect data input!&#39;</span><span class="p">)</span>
 
-<span class="c1"># Creating the widget object for display</span>
-<span class="n">out</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">interactive_output</span><span class="p">(</span><span class="n">intensification_factor</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;F_a&#39;</span><span class="p">:</span> <span class="n">F_a</span><span class="p">,</span> <span class="s1">&#39;F_b&#39;</span><span class="p">:</span> <span class="n">F_b</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">:</span> <span class="n">b</span><span class="p">})</span>
-<span class="c1"># Displaying the widget</span>
-<span class="n">display</span><span class="p">(</span><span class="n">ui</span><span class="p">,</span> <span class="n">out</span><span class="p">)</span>
+<span class="c1"># Function intenstification_factor will be called on button click</span>
+<span class="n">button</span><span class="o">.</span><span class="n">on_click</span><span class="p">(</span><span class="n">intensification_factor</span><span class="p">)</span>
+<span class="c1"># Displaying the user interface</span>
+<span class="n">ui</span>
 </pre></div>
 
     </div>
@@ -13215,20 +13316,6 @@ div#notebook {
 <div class="output_wrapper">
 <div class="output">
 
-
-<div class="output_area">
-
-    
-
-
-
-  <div class="output_subarea output_widget_view ">
-    <button class="js-nbinteract-widget">
-      Loading widgets...
-    </button>
-  </div>
-
-</div>
 
 <div class="output_area">
 
